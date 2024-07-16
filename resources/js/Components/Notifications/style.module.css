@@ -1,0 +1,10 @@
+.redDot {
+    background-color: red;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 5px;
+    top: -20px;
+    position: relative;
+}
