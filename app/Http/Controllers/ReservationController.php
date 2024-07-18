@@ -58,6 +58,7 @@ class ReservationController extends Controller
 
     public function create(Request $request)
     {
+        // dd($request->session()->get('reservation'));
         if (!$request->session()->has('reservation')) {
             return Redirect::route('site.index');
         }
@@ -67,6 +68,7 @@ class ReservationController extends Controller
         //     return Redirect::back()->with('error', 'Reservation already exists for the selected date and time');
         // }
         $reservation_session = $request->session()->get('reservation');
+        // dd($reservation_session);
         // $employee = Auth::getUserData($reservation_session['employee_uid']);
         if (is_array($reservation_session) && isset($reservation_session['employee_uid'])) {
             $employee = Auth::getUserData($reservation_session['employee_uid']);
@@ -118,7 +120,7 @@ class ReservationController extends Controller
                 'status' => 'pending'
             ];
             $reservation = Database::push('reservations', $reservation);
-            $request->session()->forget('reservation');
+            // $request->session()->forget('reservation');
 
             // $reservation = Database::getOneReference('reservations/'.$reservation->getKey());
             $reservation_key = $reservation->getKey();
@@ -131,9 +133,27 @@ class ReservationController extends Controller
 
             // dd($reservation, $employee, $patient);
 
-            Mail::to($employee['email'])->send(new ReservationBookedEmployee($reservation, $employee, $patient));
+            // Mail::to($employee['email'])->send(new ReservationBookedEmployee($reservation, $employee, $patient));
 
-            Mail::to(Auth::getUserData()['email'])->send(new ReservationBookedPatient($reservation, $patient, $employee));
+            // Mail::to(Auth::getUserData()['email'])->send(new ReservationBookedPatient($reservation, $patient, $employee));
+
+            Mail::send('mail.resbooked_employee', [
+                'reservation' => $reservation,
+                'employee' => $employee,
+                'patient' => $patient
+            ], function ($message) use ($employee, $patient) {
+                $message->to($employee['email'], $employee['name'])->subject('Reservation Booked');
+                $message->to($patient['email'], $patient['name'])->subject('Reservation Booked');
+            });
+
+            Mail::send('mail.resbooked_patient', [
+                'reservation' => $reservation,
+                'employee' => $employee,
+                'patient' => $patient
+            ], function ($message) use ($employee, $patient) {
+                $message->to($employee['email'], $employee['name'])->subject('Reservation Booked');
+                $message->to($patient['email'], $patient['name'])->subject('Reservation Booked');
+            });
 
             // dd('alsdkjflsd');
             // dd($reservation);
@@ -468,6 +488,15 @@ class ReservationController extends Controller
             // Mail::to($employee['email'])->send(new QuickReservationBookedEmployee($quick_reservation, $employee, $patient));
 
             // Mail::to(Auth::getUserData()['email'])->send(new QuickReservationBookedPatient($quick_reservation, $patient, $employee));
+
+            Mail::send('emails.quick_reservation', [
+                'quick_reservation' => $quick_reservation,
+                'employee' => $employee,
+                'patient' => $patient
+            ], function ($message) use ($employee, $patient) {
+                $message->to($employee['email'], $employee['name'])->subject('Quick Reservation Booked');
+                $message->to($patient['email'], $patient['name'])->subject('Quick Reservation Booked');
+            });
 
         } catch (\Exception $e) {
             return Redirect::back()->with('error', 'Error occured while booking reservation');

@@ -68,11 +68,33 @@
                         @csrf
 
 
+                        <!-- employees select -->
+                        <div class="row">
+                            <div class="form-group col-xl-4 col-md-12 col-sm-12 col-12">
+                                <label class="form-control-label font-weight-bold">@lang('Employee')</label>
+                                <select class="form-control select2-auto-width" name="employee_uid">
+                                    @foreach($employees as $uid => $employee)
+                                        <option value="{{$uid}}"
+                                                @if($reservation->employee_uid == $uid) selected @endif>{{$employee['name']}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <!-- errors -->
+                            @error('employee_uid')
+                                <div class="col-xl-4 col-md-12 col-sm-12 col-12">
+                                    <div class="alert alert-danger mt-2" role="alert">
+                                        {{$message}}
+                                    </div>
+                                </div>
+                            @enderror
+
+
+                        </div>
 
 
                         <div class="row">
 
-                            <div class="form-group  col-xl-4 col-md-6  col-sm-3 col-12">
+                            <div class="form-group  col-xl-4 col-md-12  col-sm-3 col-12">
                                 <label class="form-control-label font-weight-bold">@lang('Reservation Status') </label>
                                 <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger"
                                        data-toggle="toggle" data-on="@lang('Accepted')" data-off="@lang('Pending')" name="status"

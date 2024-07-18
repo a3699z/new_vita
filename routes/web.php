@@ -76,7 +76,7 @@ Route::middleware(['firebase', 'firebaseVerified'])->group(function () {
     Route::get('/quick/{key}', [ProfileController::class, 'quick'])->name('quick');
     Route::post('/quick/accept', [ProfileController::class, 'quick_accept'])->name('quick.accept');
 
-    Route::middleware('patient')->group(function () {
+    // Route::middleware('patient')->group(function () {
         Route::get('/reservation/create', [ReservationController::class, 'create'])->name('reservation.create');
         Route::get('/reservation/session', function( Request $request) {
             return $request->session()->get('reservation');
@@ -85,7 +85,7 @@ Route::middleware(['firebase', 'firebaseVerified'])->group(function () {
 
 
         Route::post('/reservation/quick/store', [ReservationController::class, 'quick_store'])->name('reservation.quick_store');
-    });
+    // });
 
 
 

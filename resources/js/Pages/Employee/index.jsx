@@ -16,8 +16,8 @@ import styles from "./style.module.css";
 import profileImg from "@/Assets/NewAppointment/profile.png";
 import PatientReviews from "@/Components/NewAppointment/PatientReviews";
 
-export default function Employee({ auth, employee, dates }) {
-    console.log(employee);
+export default function Employee({ auth, employee, dates, type }) {
+    console.log(type);
     // makeReservation
     // const checkReservation = (date, hour) => {
     //     // console.log(date,hour)
@@ -82,6 +82,7 @@ export default function Employee({ auth, employee, dates }) {
                                 employeeUID={employee.uid}
                                 quickDate={employee.quick_date}
                                 quickHour={employee.quick_hour}
+                                type={type}
                             />
                         </div>
                     </div>

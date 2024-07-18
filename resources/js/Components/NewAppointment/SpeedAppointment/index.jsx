@@ -17,6 +17,7 @@ import QuickAppointmentRequest from "@/Components/NewAppointment/QuickAppointmen
 import { Head, Link, useForm } from '@inertiajs/react';
 
 
+
 // const deDays = [
 //   "Sonntag",
 //   "Montag",
@@ -29,9 +30,13 @@ import { Head, Link, useForm } from '@inertiajs/react';
 const deToday = "Heute";
 const deTomorrow = "Morgen";
 
-const SpeedAppointment = ({dates, employeeUID, quickDate, quickHour}) => {
+const SpeedAppointment = ({dates, employeeUID, quickDate, quickHour, type}) => {
+
+    //
     const [hours, setHours] = useState([]);
-    const [activeTab, setActiveTab] = useState("online");
+    console.log(type)
+    const [activeTab, setActiveTab] = useState(type === "onsite" ? "onsite" : "online");
+    console.log(activeTab)
 
 
     const { data, setData, post, get, processing, errors, reset } = useForm({
@@ -42,8 +47,10 @@ const SpeedAppointment = ({dates, employeeUID, quickDate, quickHour}) => {
     });
 
 
-    const selectDate = (date, tab="online") => {
-        console.log(activeTab)
+    const selectDate = (date, tab="") => {
+        if (tab === "") {
+            tab = activeTab;
+        }
         axios.get('/reservation/get_hours?date='+date+'&employeeUID='+employeeUID+'&type='+tab, {
             date: date,
             employeeUID: employeeUID,

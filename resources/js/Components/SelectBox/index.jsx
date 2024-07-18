@@ -15,7 +15,10 @@ import avatar7 from "@/Assets/SelectBox/Avatar-6.png";
 import avatar8 from "@/Assets/SelectBox/Avatar-7.png";
 import logo from "@/Assets/Logo.png"
 
-// import route from "@inertiajs/react";
+import { router } from '@inertiajs/core';
+
+import { TbBuildingBank } from "react-icons/tb";
+import { IoVideocamOutline } from "react-icons/io5";
 
 const doctors = [
   {
@@ -85,63 +88,103 @@ const SelectBox = (employees) => {
     setOptionsOpen(!isOptionsOpen);
   };
 
-  console.log(route('employee.show', 'g9l6xRNxIPbhZ6cIUwUC0pfj8Yz1'));
+  const [selectedType , setSelectedType] = useState('online');
+  console.log(selectedType);
 
   const handleChangeSelcetedDoctor = (employee_uid) => {
-    // go to employee page with route
 
+    // get the selected appointmentType
+    const appointmentType = document.querySelector('input[name="appointmentType"]:checked').value;
+    const url = route('employee.show', employee_uid) + `?type=${appointmentType}`;
 
+    // create a Link object and click it
 
-
-    // setSelcetedDoctor(doctor);
-    // setOptionsOpen(false);
+    router.get(url);
   };
 
+
+
   return (
-    <div className={styles.container}>
-      {/* slectBox selected start */}
-      <div className={styles.selectBoxContainer}>
-        <div
-          className={styles.selectBoxSelectedItemContainer}
-          onClick={toggleOpenOptions}
-        >
-          <div className={styles.selectBoxSelectedItem}>
-            {selectedDoctor
-              ? selectedDoctor.doctorName
-              : "z.ß.Fachgebeit, Erkrankung, Name"}
-          </div>
-          <img
-            src={arrowDownIcon}
-            alt=""
-            style={
-              isOptionsOpen
-                ? { transform: "rotate(180deg)", transition: ".3s" }
-                : { transition: ".3s" }
-            }
-          />
-        </div>
-        <button className={styles.selectBoxBtn}>Suche</button>
-      </div>
-      {/* slectBox selected end */}
-      {isOptionsOpen && (
-        <div className={styles.optionsContainer}>
-          {employees.employees.employees.map((employee) => (
-            <Link
-              className={styles.option}
-            //   key={doctor.id}
-            //   onClick={() => handleChangeSelcetedDoctor(employee.uid)}
-                href={route('employee.show', employee.uid)}
+    <>
+        {/* <div className="mt-10 flex flex-col md:flex-row gap-4">
+                    <Link
+                        href={route("doctor.doctorList", { tab: "tab1" })}
+                        className="flex items-center gap-2 bg-[#ca9b31] hover:bg-[#f9f8f2] border-2 border-[#ca9b31] hover:text-[#ca9b31]  text-white font-medium text-lg px-4 py-3 rounded-xl shadow-md   transition duration-150 ease-in-out"
+                    >
+                        <TbBuildingBank />
+                        Vor-Ort-Termin
+                    </Link>
+                    <Link
+                        href={route("doctor.doctorList", { tab: "tab2" })}
+                        className="flex items-center gap-2 bg-[#ca9b31] hover:bg-[#f9f8f2] hover:border hover:border-[#ca9b31] hover:text-[#ca9b31]  text-white font-medium text-lg px-4 py-3 rounded-xl shadow-md   transition duration-150 ease-in-out"
+                    >
+                        <IoVideocamOutline />
+                        Videosprechstunde
+                    </Link>
+                </div> */}
+
+                {/* using radio input instead */}
+                <div className="mt-10 flex flex-col md:flex-row gap-4">
+                    {/* <label className="flex items-center gap-2 bg-[#ca9b31] hover:bg-[#f9f8f2] border-2 border-[#ca9b31] hover:text-[#ca9b31]  text-white font-medium text-lg px-4 py-3 rounded-xl shadow-md   transition duration-150 ease-in-out">
+                    // give it radioLabel and if it is selected give it selectedRadioLabel */}
+                    <label className={styles.radioLabel + (selectedType === 'onsite' ? ' ' + styles.selectedRadioLabel : '')}>
+                        <input type="radio" name="appointmentType" value="onsite" onChange={(e) => setSelectedType(e.target.value)} checked={selectedType === 'onsite'} />
+                        <TbBuildingBank />
+                        Vor-Ort-Termin
+                    </label>
+                    {/* <label className="flex items-center gap-2 bg-[#ca9b31] hover:bg-[#f9f8f2] hover:border hover:border-[#ca9b31] hover:text-[#ca9b31]  text-white font-medium text-lg px-4 py-3 rounded-xl shadow-md   transition duration-150 ease-in-out"> */}
+                    <label className={styles.radioLabel + (selectedType === 'online' ? ' ' + styles.selectedRadioLabel : '')}>
+                        <input type="radio" name="appointmentType" value="online" onChange={(e) => setSelectedType(e.target.value)} checked={selectedType === 'online'} />
+                        <IoVideocamOutline />
+                        Videosprechstunde
+                    </label>
+                </div>
+
+        <div className={styles.container}>
+        {/* slectBox selected start */}
+        <div className={styles.selectBoxContainer}>
+            <div
+            className={styles.selectBoxSelectedItemContainer}
+            onClick={toggleOpenOptions}
             >
-              <div>
-                <h5 className={styles.doctorName}>{employee.username} {employee.name}</h5>
-                <p className={styles.doctorProfession}>{employee.profession}</p>
-              </div>
-              <img src={employee.profile_image?'/images/'+employee.profile_image:logo} alt="" className={styles.doctorImg} />
-            </Link>
-          ))}
+            <div className={styles.selectBoxSelectedItem}>
+                {selectedDoctor
+                ? selectedDoctor.doctorName
+                : "z.ß.Fachgebeit, Erkrankung, Name"}
+            </div>
+            <img
+                src={arrowDownIcon}
+                alt=""
+                style={
+                isOptionsOpen
+                    ? { transform: "rotate(180deg)", transition: ".3s" }
+                    : { transition: ".3s" }
+                }
+            />
+            </div>
+            <button className={styles.selectBoxBtn}>Suche</button>
         </div>
-      )}
-    </div>
+        {/* slectBox selected end */}
+        {isOptionsOpen && (
+            <div className={styles.optionsContainer}>
+            {employees.employees.employees.map((employee) => (
+                <Link
+                className={styles.option}
+                //   key={doctor.id}
+                //   onClick={() => handleChangeSelcetedDoctor(employee.uid)}
+                    href={route('employee.show', employee.uid)+`?type=${selectedType}`}
+                >
+                <div>
+                    <h5 className={styles.doctorName}>{employee.username} {employee.name}</h5>
+                    <p className={styles.doctorProfession}>{employee.profession}</p>
+                </div>
+                <img src={employee.profile_image?'/images/'+employee.profile_image:logo} alt="" className={styles.doctorImg} />
+                </Link>
+            ))}
+            </div>
+        )}
+        </div>
+    </>
   );
 };
 

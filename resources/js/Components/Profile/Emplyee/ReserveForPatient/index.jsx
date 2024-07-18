@@ -9,9 +9,13 @@ import leftArrowIcon from "@/Assets/NewAppointment/leftArrowIcon.svg";
 
 import QuickAppointmentRequest from "@/Components/NewAppointment/QuickAppointmentRequest";
 
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+
 
 const ReserveForPatient = ({auth}) => {
-    console.log(auth);
     const [patients, setPatients] = useState([]);
     const [dates, setDates] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -112,18 +116,48 @@ const ReserveForPatient = ({auth}) => {
         });
     };
 
+
+    const handleClose = () => {
+        setShow(false);
+    }
+
+    const [successRes, setSuccessRes] = useState(false);
+    const [show, setShow] = useState(false);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        post("/reserveforpatient", {
-            onSuccess: () => {
-                reset();
-            },
-        });
+        post("/reserveforpatient",
+            {
+                onSuccess: () => {
+                    console.log("success");
+                    setSuccessRes(true);
+                    setShow(true);
+                    reset();
+                }
+            }
+        );
     }
 
 
     return (
         <div className={styles.container}>
+            {/* onSuccess make a modal */}
+            {successRes &&
+                <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                <Modal.Title>
+                Erfolg
+                </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Reservation wurde erfolgreich erstellt.</Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Ok
+                </Button>
+                </Modal.Footer>
+            </Modal>}
+
+
             <h1 className={styles.title}>Reservierungen</h1>
             <div className={styles.patients}>
                 {/* {patients.map((patient) => (

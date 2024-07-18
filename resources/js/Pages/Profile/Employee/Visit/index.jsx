@@ -10,8 +10,8 @@ import rightArrowIcon from "@/Assets/Profile/visit/rightArrowIcon.svg";
 import NavBar from '@/Components/NavBar';
 
 
-const VisitDetails = ({auth, reservation}) => {
-    console.log(reservation);
+const VisitDetails = ({auth, reservation, success}) => {
+    console.log(success);
   return (
     <>
         <NavBar user={auth.user} />
@@ -97,7 +97,7 @@ const VisitDetails = ({auth, reservation}) => {
                             </div>
                             <div className={styles.group}>
                             <h5 className={styles.groupTitle}>Patientendaten</h5>
-                            <p className={styles.groupDesc}>{reservation.patient.name}</p>
+                            <p className={styles.groupDesc}>{reservation.patient.username} {reservation.patient.name}</p>
                             <p className={styles.groupDesc}>{reservation.patient.email}</p>
                             </div>
                         </div>

@@ -84,11 +84,13 @@ class EmployeeController extends Controller
         if (!empty($data['hour'])) {
             $employee['quick_date'] = $data['date'];
             $employee['quick_hour'] = $data['hour'];
+
         }
 
         return Inertia::render('Employee/index', [
             'employee' => $employee,
-            'dates' => $dates
+            'dates' => $dates,
+            'type' => $request->type ?? 'online'
         ]);
 
     }

@@ -7,6 +7,13 @@ import rightArrowIcon from "@/Assets/NewAppointment/rightArrowIcon.svg";
 import leftArrowIcon from "@/Assets/NewAppointment/leftArrowIcon.svg";
 
 
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+
+
 const BlockDatesHours = ({auth}) => {
 
     const [hours, setHours] = useState([]);
@@ -53,12 +60,23 @@ const BlockDatesHours = ({auth}) => {
         }
         setData("hours", hours);
     }
+    const [successRes, setSuccessRes] = useState(false);
+    const [show, setShow] = useState(false);
+
+
+    const handleClose = () => {
+        setShow(false);
+    }
 
     const submit = () => {
-        post(route('blockhours'), {
+        post(route('blockhours'),
+        {
             onSuccess: () => {
+                console.log("success");
+                setSuccessRes(true);
+                setShow(true);
                 reset();
-            },
+            }
         });
     }
     // dates are dates from tomorrow to 7 days from tomorrow
@@ -107,6 +125,23 @@ const BlockDatesHours = ({auth}) => {
     return (
 
         <div>
+
+            {/* onSuccess make a modal */}
+            {successRes &&
+                <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                <Modal.Title>
+                Erfolg
+                </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>This clock has been blocked successfully.</Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Ok
+                </Button>
+                </Modal.Footer>
+            </Modal>}
+
             <h3 className={styles.title}>Blockierte Termine</h3>
             <p className={styles.subtitle}>Wählen Sie die Termine und Stunden aus, die Sie blockieren möchten</p>
             {/* <form> */}
