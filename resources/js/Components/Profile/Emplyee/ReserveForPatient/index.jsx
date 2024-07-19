@@ -29,57 +29,58 @@ import { useRef } from "react";
 
 
 
-const hours = [
-    "08:00",
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-];
-
-const hours2 = [
-    "08:00",
-    "08:15",
-    "08:30",
-    "08:45",
-    "09:00",
-    "09:15",
-    "09:30",
-    "09:45",
-    "10:00",
-    "10:15",
-    "10:30",
-    "10:45",
-    "11:00",
-    "11:15",
-    "11:30",
-    "11:45",
-    "12:00",
-    "12:15",
-    "12:30",
-    "12:45",
-    "13:00",
-    "13:15",
-    "13:30",
-    "13:45",
-    "14:00",
-    "14:15",
-    "14:30",
-    "14:45",
-    "15:00",
-];
-
 const ReserveForPatient = ({auth}) => {
     const [patients, setPatients] = useState([]);
     const [dates, setDates] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const [hours, setHours] = useState([]);
+    // const [hours, setHours] = useState([]);
     const [activeTab, setActiveTab] = useState("online");
     const [showMore, setShowMore] = useState(false);
+    const hours = [
+        "08:00",
+        "09:00",
+        "10:00",
+        "11:00",
+        "12:00",
+        "13:00",
+        "14:00",
+        "15:00",
+    ];
+
+    const hours2 = [
+        "08:00",
+        "08:15",
+        "08:30",
+        "08:45",
+        "09:00",
+        "09:15",
+        "09:30",
+        "09:45",
+        "10:00",
+        "10:15",
+        "10:30",
+        "10:45",
+        "11:00",
+        "11:15",
+        "11:30",
+        "11:45",
+        "12:00",
+        "12:15",
+        "12:30",
+        "12:45",
+        "13:00",
+        "13:15",
+        "13:30",
+        "13:45",
+        "14:00",
+        "14:15",
+        "14:30",
+        "14:45",
+        "15:00",
+    ];
+
+
 
 
 
@@ -185,13 +186,15 @@ const ReserveForPatient = ({auth}) => {
 
     useEffect(() => {
         // getDays();
-        handleActivaTab("online");
+        // handleActivaTab("online");
         getBlockedHours();
     }, []);
 
 
     const handleActivaTab = (tab) => {
         setActiveTab(tab);
+        console.log(activeTab);
+        setData("online", tab === "online" ? 1 : 0);
     }
 
 
@@ -330,7 +333,7 @@ const ReserveForPatient = ({auth}) => {
 
         {/* select for online or offline */}
         <div className={styles.divider}></div>
-        <div className={styles.formGroup}>
+        {/* <div className={styles.formGroup}>
             <label htmlFor="appointmentType" className={styles.label}>
             Art der Reservierung
             </label>
@@ -339,7 +342,45 @@ const ReserveForPatient = ({auth}) => {
                 <option value="onsite" {...activeTab === "onsite" ? "selected" : ""}>Vor Ort</option>
             </select>
             <InputError error={errors.online} />
-        </div>
+        </div> */}
+
+        <ul className="flex border-b-[1px] gap-6">
+                                    <li
+                                        onClick={() => handleActivaTab('onsite')}
+                                        // onClick={() => setActiveTab('onsite')}
+                                        className={`tab-item relative pb-3 cursor-pointer
+                                        ${
+                                            activeTab ===
+                                            "onsite"
+                                                ? "after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-[#627282]"
+                                                : "text-[#627282]"
+                                        }`}
+                                    >
+                                        <div href="#tab1" className=" ">
+                                            Vor-Ort-Termin{" "}
+                                        </div>
+                                    </li>
+
+                                    <li
+                                        onClick={() => handleActivaTab('online')}
+                                        // onClick={() => setActiveTab('online')}
+                                        className={`tab-item relative pb-3 cursor-pointer
+                                        ${
+                                            activeTab ===
+                                            "online"
+                                                ? "after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-[#627282]"
+                                                : "text-[#627282]"
+                                        }`}
+                                    >
+                                        <div
+                                            href="#tab2"
+                                            className="flex gap-1 items-center   "
+                                        >
+                                            <IoIosVideocam />
+                                            Videosprechstunde{" "}
+                                        </div>
+                                    </li>
+                                </ul>
 
 
         <div className="flex-1  w-full bg-white shadow-md ">
@@ -413,11 +454,6 @@ const ReserveForPatient = ({auth}) => {
                                                                                       (
                                                                                           hour
                                                                                       ) => (
-                                                                                        console.log(blockedHours[date.date]),
-                                                                                        // check if the hour in blockedHours[date] array
-                                                                                        blockedHours[date] && blockedHours[date].includes(hour) ? (
-
-                                                                                            <button>blockec</button>) : (
 
                                                                                                 <button
                                                                                                 className={blockedHours[date.date] && blockedHours[date.date].includes(hour) ? "border-2 border-transparent text-[#c7982e] bg-[#c99b314d] text-base font-semibold px-3 py-1 rounded-md disabled bg-gray-300 cursor-not-allowed timeBox" :
@@ -432,7 +468,7 @@ const ReserveForPatient = ({auth}) => {
                                                                                                     hour
                                                                                                 }
                                                                                             </button>
-                                                                                          )
+
                                                                                       )
                                                                                   )}
                                                                               </div>
@@ -444,7 +480,6 @@ const ReserveForPatient = ({auth}) => {
                                                                   (
                                                                       date
                                                                   ) => {
-                                                                    console.log(blockedHours[date.date]);
                                                                       return (
                                                                           <div
                                                                               className="flex flex-col gap-8"
@@ -483,11 +518,6 @@ const ReserveForPatient = ({auth}) => {
                                                                                           (
                                                                                               hour
                                                                                           ) => (
-                                                                                            console.log(blockedHours[date.date]),
-
-                                                                                            blockedHours[date] && blockedHours[date].includes(hour) ?  (
-
-                                                                                                <button>blockec</button>) : (
 
                                                                                                     <button
 
@@ -502,7 +532,6 @@ const ReserveForPatient = ({auth}) => {
                                                                                                         hour
                                                                                                     }
                                                                                                 </button>
-                                                                                              )
                                                                                           )
                                                                                       )}
                                                                               </div>
@@ -598,7 +627,6 @@ const ReserveForPatient = ({auth}) => {
                                                     showMore
                                                         ? dates.map(
                                                               (date) => {
-                                                                console.log(blockedHours[date.date]);
                                                                   return (
                                                                       <div
                                                                           className="flex flex-col gap-8"
@@ -628,15 +656,11 @@ const ReserveForPatient = ({auth}) => {
                                                                           </div>
 
                                                                           <div className="flex flex-col items-center justify-center gap-2 min-w-[100px]">
+                                                                            hello
                                                                               {hours2.map(
                                                                                   (
                                                                                       hour
                                                                                   ) => (
-                                                                                    console.log(blockedHours[date.date]),
-
-                                                                                        blockedHours[date] && blockedHours[date].includes(hour) ?  (
-
-                                                                                            <button>blockec</button>) : (
 
                                                                                                 <button
 
@@ -651,7 +675,6 @@ const ReserveForPatient = ({auth}) => {
                                                                                                     hour
                                                                                                 }
                                                                                             </button>
-                                                                                          )
                                                                                   )
                                                                               )}
                                                                           </div>
@@ -661,7 +684,6 @@ const ReserveForPatient = ({auth}) => {
                                                           )
                                                         : dates.map(
                                                               (date) => {
-                                                              console.log(blockedHours[date.date]);
                                                                   return (
                                                                       <div
                                                                           className="flex flex-col gap-8"
@@ -701,10 +723,6 @@ const ReserveForPatient = ({auth}) => {
                                                                                           hour
                                                                                       ) => (
 
-                                                                                            blockedHours[date] && blockedHours[date].includes(hour) ?  (
-
-                                                                                                <button>blockec</button>) : (
-
                                                                                                     <button
 
                                                                                                     className={blockedHours[date.date] && blockedHours[date.date].includes(hour) ? "border-2 border-transparent text-[#c7982e] bg-[#c99b314d] text-base font-semibold px-3 py-1 rounded-md disabled bg-gray-300 cursor-not-allowed timeBox" :
@@ -718,7 +736,6 @@ const ReserveForPatient = ({auth}) => {
                                                                                                         hour
                                                                                                     }
                                                                                                 </button>
-                                                                                              )
                                                                                       )
                                                                                   )}
                                                                           </div>
