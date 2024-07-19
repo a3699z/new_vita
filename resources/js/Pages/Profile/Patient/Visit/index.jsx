@@ -12,6 +12,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 // import { router } from '@inertiajs/react';
 
 const VisitDetails = ({auth, reservation}) => {
+    console.log(reservation);
     const { data, setData, post, processing, errors, reset } = useForm({
         key: reservation.key
     });
@@ -61,10 +62,26 @@ const VisitDetails = ({auth, reservation}) => {
                         <div className={styles.iconContainer}>
                         <img src={calendarIcon} alt="" />
                         </div>
-                        <div className={styles.group}>
-                        <h5 className={styles.groupTitle}>Videosprechstunde Termin</h5>
-                        <p className={styles.groupDesc}>60 min</p>
-                        </div>
+
+                        {reservation.is_online && (
+                                                        <div className={styles.group}>
+
+                                                        <h5 className={styles.groupTitle}>
+
+                                                        Videosprechstunde Termin
+                            </h5>
+                        <p className={styles.groupDesc}>15 min</p>
+                            </div>
+                            )}
+                            {!reservation.is_online && (
+                                                        <div className={styles.group}>
+
+                                <h5 className={styles.groupTitle}>
+                                Präsenztermin
+                                </h5>
+                                <p className={styles.groupDesc}>60 min</p>
+                            </div>
+                            )}
                     </div>
                     </div>
 

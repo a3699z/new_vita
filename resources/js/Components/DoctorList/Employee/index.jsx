@@ -71,10 +71,18 @@ const hours2 = [
     "15:00",
 ];
 
-export default function Employee({ employee, type, dates }) {
+export default function Employee({ employee, type, dates, showMore, setShowMore }) {
     const [activeTab, setActiveTab] = useState(type === "onsite" ? "onsite" : "online");
 
-    const [showMore, setShowMore] = useState(false);
+    // const [showMore, setShowMore] = useState(false);
+
+    const handleShowMoreClick = (employeeUid) => {
+        setShowMore((prevState) => ({
+            ...prevState,
+            [employeeUid]: !prevState[employeeUid],
+        }));
+    };
+
 
     const [blockedHours, setBlockedHours] = useState(null);
 
@@ -114,6 +122,7 @@ export default function Employee({ employee, type, dates }) {
 
     const handleActivaTab = (tab) => {
         setActiveTab(tab);
+        setData("online", tab === "online" ? 1 : 0);
     }
 
 
@@ -125,7 +134,7 @@ export default function Employee({ employee, type, dates }) {
 
     useEffect(() => {
         // getDays();
-        handleActivaTab(type);
+        // handleActivaTab(type);
         getBlockedHours();
     }, []);
 
@@ -136,7 +145,7 @@ export default function Employee({ employee, type, dates }) {
         date: null,
         hour: null,
         time: '',
-        online: activeTab === "online" ? 1 : 0,
+        online: type === "online" ? 1 : 0,
         employeeUID: employee.uid,
     });
 
@@ -175,9 +184,12 @@ export default function Employee({ employee, type, dates }) {
                 if (!timeBox.hasAttribute("disabled")) {
                     firstAvailable = timeBox;
                     setData("time", firstAvailable.getAttribute("data-date") + " " + firstAvailable.getAttribute("data-hour"));
-                    // console.log(firstAvailable.getAttribute("data-date") + " " + firstAvailable.getAttribute("data-hour"));
-                    // data.push("time", firstAvailable.getAttribute("data-date") + " " + firstAvailable.getAttribute("data-hour"));
-                    submit();
+                    // document.querySelector(`button[data-employee="submit-`+employee.uid+`"]`).click();
+                    // // sleep for 2 seconds
+                    // setTimeout(() => {
+                        submit();
+                    // }, 2000);
+                    // getFirstAvailable(true);
 
                 }
             }
@@ -247,34 +259,38 @@ export default function Employee({ employee, type, dates }) {
                                 <ul className="flex border-b-[1px] gap-6">
                                     <li
                                         onClick={() => handleActivaTab('onsite')}
-                                        className={`tab-item relative pb-3  ${
+                                        // onClick={() => setActiveTab('onsite')}
+                                        className={`tab-item relative pb-3 cursor-pointer
+                                        ${
                                             activeTab ===
                                             "onsite"
                                                 ? "after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-[#627282]"
                                                 : "text-[#627282]"
                                         }`}
                                     >
-                                        <a href="#tab1" className=" ">
+                                        <div href="#tab1" className=" ">
                                             Vor-Ort-Termin{" "}
-                                        </a>
+                                        </div>
                                     </li>
 
                                     <li
                                         onClick={() => handleActivaTab('online')}
-                                        className={`tab-item relative pb-3  ${
+                                        // onClick={() => setActiveTab('online')}
+                                        className={`tab-item relative pb-3 cursor-pointer
+                                        ${
                                             activeTab ===
                                             "online"
                                                 ? "after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-[#627282]"
                                                 : "text-[#627282]"
                                         }`}
                                     >
-                                        <a
+                                        <div
                                             href="#tab2"
                                             className="flex gap-1 items-center   "
                                         >
                                             <IoIosVideocam />
                                             Videosprechstunde{" "}
-                                        </a>
+                                        </div>
                                     </li>
                                 </ul>
 
@@ -346,7 +362,8 @@ export default function Employee({ employee, type, dates }) {
                                                 >
                                                     {
                                                         blockedHours  && (
-                                                    showMore
+                                                    // showMore
+                                                    showMore[employee.uid]
                                                         ? dates.map(
                                                               (
                                                                   date
@@ -502,10 +519,12 @@ export default function Employee({ employee, type, dates }) {
                                             </div>
 
                                             <button
-                                                onClick={() => setShowMore(!showMore)}
+                                                // onClick={() => setShowMore(!showMore)}
+                                                onClick={() => handleShowMoreClick(employee.uid)}
                                                 className=" text-[#c7982e] mb-6 flex gap-2 items-center justify-center "
                                             >
-                                                {showMore ? (
+                                                {/* {showMore ? ( */}
+                                                {showMore[employee.uid] ? (
                                                     <>
                                                         {" "}
                                                         <span>
@@ -593,7 +612,8 @@ export default function Employee({ employee, type, dates }) {
                                             >
                                                 {
                                                 blockedHours &&  (
-                                                showMore
+                                                // showMore
+                                                showMore[employee.uid]
                                                     ? dates.map(
                                                           (date) => {
                                                             // console.log(blockedHours[date.date]);
@@ -744,10 +764,12 @@ export default function Employee({ employee, type, dates }) {
                                         </div>
 
                                         <button
-                                            onClick={() => setShowMore(!showMore)}
+                                            // onClick={() => setShowMore(!showMore)}
+                                            onClick={() => handleShowMoreClick(employee.uid)}
                                             className=" text-[#c7982e] mb-6 flex gap-2 items-center justify-center "
                                         >
-                                            {showMore ? (
+                                            {/* {showMore ? ( */}
+                                            {showMore[employee.uid] ? (
                                                 <>
                                                     {" "}
                                                     <span>
@@ -774,6 +796,7 @@ export default function Employee({ employee, type, dates }) {
                                                 styles.submitBtnQuick
                                             }
                                             onClick={submit}
+                                            data-employee={"submit-"+employee.uid}
 
                                         >
                                             Termin vereinbaren

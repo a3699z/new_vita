@@ -11,7 +11,7 @@ import NavBar from '@/Components/NavBar';
 
 
 const VisitDetails = ({auth, reservation, success}) => {
-    console.log(success);
+    console.log(reservation);
   return (
     <>
         <NavBar user={auth.user} />
@@ -52,14 +52,30 @@ const VisitDetails = ({auth, reservation, success}) => {
                         <div className={styles.iconContainer}>
                         <img src={calendarIcon} alt="" />
                         </div>
-                        <div className={styles.group}>
-                        <h5 className={styles.groupTitle}>Videosprechstunde Termin</h5>
-                        <p className={styles.groupDesc}>60 min</p>
-                        </div>
+                            {reservation.is_online && (
+                                                        <div className={styles.group}>
+
+                                                        <h5 className={styles.groupTitle}>
+
+                                                        Videosprechstunde Termin
+                            </h5>
+                        <p className={styles.groupDesc}>15 min</p>
+                            </div>
+                            )}
+                            {!reservation.is_online && (
+                                                        <div className={styles.group}>
+
+                                <h5 className={styles.groupTitle}>
+                                Präsenztermin
+                                </h5>
+                                <p className={styles.groupDesc}>60 min</p>
+                            </div>
+                            )}
                     </div>
                     </div>
 
                     {/* inssurance data */}
+
                     <div className={styles.row}>
                         <div className={styles.groupContainer}>
                             <div className={styles.iconContainer}>

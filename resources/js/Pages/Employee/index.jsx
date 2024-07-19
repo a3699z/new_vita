@@ -130,6 +130,7 @@ export default function Employee({ auth, dates, employee, type }) {
 
     const handleActivaTab = (tab) => {
         setActiveTab(tab);
+        setData("online", tab === "online" ? 1 : 0);
     }
 
 
@@ -149,7 +150,6 @@ export default function Employee({ auth, dates, employee, type }) {
     }
 
     useEffect(() => {
-        // getDays();
         handleActivaTab(type);
         getBlockedHours();
     }, []);
@@ -159,7 +159,7 @@ export default function Employee({ auth, dates, employee, type }) {
         date: null,
         hour: null,
         time: null,
-        online: activeTab === "online" ? 1 : 0,
+        online: type === "online" ? 1 : 0,
         employeeUID: employee.uid,
     });
 
@@ -263,34 +263,35 @@ export default function Employee({ auth, dates, employee, type }) {
                                     <ul className="flex border-b-[1px] gap-6">
                                         <li
                                             onClick={() => handleActivaTab('onsite')}
-                                            className={`tab-item relative pb-3  ${
+                                            className={`tab-item relative pb-3 cursor-pointer
+                                            ${
                                                 activeTab ===
                                                 "onsite"
                                                     ? "after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-[#627282]"
                                                     : "text-[#627282]"
                                             }`}
                                         >
-                                            <a href="#tab1" className=" ">
+                                            <div  className=" ">
                                                 Vor-Ort-Termin{" "}
-                                            </a>
+                                            </div>
                                         </li>
 
                                         <li
                                             onClick={() => handleActivaTab('online')}
-                                            className={`tab-item relative pb-3  ${
+                                            className={`tab-item relative pb-3 cursor-pointer
+                                              ${
                                                 activeTab ===
                                                 "online"
                                                     ? "after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-[#627282]"
                                                     : "text-[#627282]"
                                             }`}
                                         >
-                                            <a
-                                                href="#tab2"
+                                            <div
                                                 className="flex gap-1 items-center   "
                                             >
                                                 <IoIosVideocam />
                                                 Videosprechstunde{" "}
-                                            </a>
+                                            </div>
                                         </li>
                                     </ul>
 
@@ -792,58 +793,6 @@ export default function Employee({ auth, dates, employee, type }) {
                             </div>
                         </div>
                     </div>
-                {/* <NavBar2 /> */}
-                {/* <div
-                    className={`${styles.content} flex flex-col md:flex-row  `}
-                >
-                    <div className={`${styles.left}  `}>
-                        <div
-                            className={`${styles.imgContainer} max-w-[800px] `}
-                        >
-                            <img
-                                src={
-                                    employee.profile_image
-                                        ? "/images/" + employee.profile_image
-                                        : profileImg
-                                }
-                                alt=""
-                                className={styles.profileImg}
-                            />
-                        </div>
-                    </div>
-
-                    <div className={`${styles.right}  sm:mt-4 lg:mt-0`}>
-                        <div>
-                            <h5 className={`${styles.doctorName}`}>
-                                {employee.username} {employee.name}
-                            </h5>
-                            {employee.profession ? (
-                                <p className={styles.doctorProfession}>
-                                    {employee.profession}
-                                </p>
-                            ) : (
-                                ""
-                            )}
-                        </div>
-
-                        <div>
-                            <Hashtag
-                                tags={
-                                    employee.specializations
-                                        ? employee.specializations
-                                        : []
-                                }
-                            />
-                            <SpeedAppointment
-                                dates={dates}
-                                employeeUID={employee.uid}
-                                quickDate={employee.quick_date}
-                                quickHour={employee.quick_hour}
-                                type={type}
-                            />
-                        </div>
-                    </div>
-                </div> */}
                 <Footer />
             </div>
         </>

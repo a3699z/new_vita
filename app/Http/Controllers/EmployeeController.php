@@ -90,7 +90,7 @@ class EmployeeController extends Controller
             if (!$reservation['is_online']) {
                 $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +15 minutes'));
                 $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +30 minutes'));
-                $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +45 minutes'));
+                // $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +45 minutes'));
             }
         }
         // dd($blocked);

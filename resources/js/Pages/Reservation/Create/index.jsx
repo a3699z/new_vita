@@ -91,7 +91,7 @@ export default function Create({ auth, employee, date, hour, is_online, success,
                                     </h4>
 
                                     <h5 className={styles.doctorName}>
-                                        İlknur Ertürk
+                                    {employee.username} {employee.name}
                                     </h5>
                                     {/* { employee.profession ? <h6 className={styles.profession}>{employee.profession}</h6> : '' } */}
                                     {

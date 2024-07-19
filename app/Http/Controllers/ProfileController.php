@@ -46,6 +46,7 @@ class ProfileController extends Controller
             ]);
         } else if ($reservation['user_uid'] == $loggedInUser) {
             $reservation['employee'] = Auth::getUserData($reservation['employee_uid']);
+            // dd($reservation);
             return Inertia::render('Profile/Patient/Visit/index', [
                 'reservation' => $reservation
             ]);

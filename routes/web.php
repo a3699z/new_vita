@@ -38,7 +38,7 @@ Route::get('/reservation', function () {
 //     return Inertia::render('DoctorList/index');
 // });
 
-Route::get('/employees', [EmployeeController::class, 'index'])->name('employee.index');
+Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
 
 
 Route::get('/employee/get_days/{uid}/{type}', [EmployeeController::class, 'get_days'])->name('employee.get_days');
