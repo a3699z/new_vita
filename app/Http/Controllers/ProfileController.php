@@ -290,53 +290,22 @@ class ProfileController extends Controller
 
     public function getblockhours(Request $request)
     {
-        $date = $request->date;
-
-        $blocked_hours = Auth::getBlockedHours($date);
-
-        // dd($blocked_hours);
-
-
-        $hours = [];
-        $hour = '08:00';
-        $end_hour = '15:00';
-
-        while (strtotime($hour) <= strtotime($end_hour)) {
-            $hours[] = [
-                'hour' => $hour,
-                'blocked' => is_array($blocked_hours) && in_array($hour, $blocked_hours)
-            ];
-            $hour = date('H:i', strtotime($hour . ' +60 minutes'));
-        }
-
-
-
-        return response()->json($hours);
+        // $uid = Auth::getUID();
+        $blocked_hours = Auth::getBlockedHours() ?? [];
+        return response()->json($blocked_hours);
     }
 
     public function blockhours(Request $request)
     {
         // valide the request
         $request->validate([
-            'date' => 'required',
-            'hours' => 'required'
+            // 'date' => 'required',
+            // 'hours' => 'required'
+            'times' => 'required'
         ]);
+        $blocked_hours = $request->times;
 
-        $date = $request->date;
-        $hours = $request->hours;
-
-        $blocked_hours = Auth::getBlockedHours($date);
-
-        if (!is_array($blocked_hours)) {
-            $blocked_hours = [];
-        }
-
-        foreach ($hours as $hour) {
-            if (!in_array($hour, $blocked_hours)) {
-                $blocked_hours[] = $hour;
-            }
-        }
-        Database::set('users/' . Auth::getUID() . '/blocked_hours/' . $date, $blocked_hours);
+        Database::set('users/' . Auth::getUID() . '/blocked_hours', $blocked_hours);
 
         return Redirect::route('profile.index');
 

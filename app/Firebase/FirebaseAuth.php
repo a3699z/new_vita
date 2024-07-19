@@ -452,7 +452,10 @@ class FirebaseAuth
         return $userNotifcation;
     }
 
-    public function getBlockedHours($date) {
+    public function getBlockedHours($date=null) {
+        if ($date == null) {
+            return $this->database->getReference('users/' . $this->getUID() . '/blocked_hours')->getValue();
+        }
         return $this->database->getReference('users/' . $this->getUID() . '/blocked_hours/' . $date)->getValue();
     }
 }

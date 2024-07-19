@@ -15,6 +15,112 @@ use App\Http\Facades\Database;
 
 class EmployeeController extends Controller
 {
+
+    public function get_blocked_hours(Request $request, $uid) {
+        $blocked_hours = Database::get('users/' . $uid . '/blocked_hours');
+        $blocked = [];
+        foreach ($blocked_hours as $date => $hours) {
+            foreach ($hours as $hour) {
+                $blocked[$date][] = $hour;
+                $blocked[$date][] = date('H:i', strtotime($hour . ' +15 minutes'));
+                $blocked[$date][] = date('H:i', strtotime($hour . ' +30 minutes'));
+                $blocked[$date][] = date('H:i', strtotime($hour . ' +45 minutes'));
+
+            }
+        }
+        $reservations = Database::getWhere('reservations', 'employee_uid', $uid);
+        foreach ($reservations as $reservation) {
+            $blocked[$reservation['date']][] = $reservation['hour'];
+            // if the reservations not online add 3 more hours
+            if (!$reservation['is_online']) {
+                $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +15 minutes'));
+                $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +30 minutes'));
+                $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +45 minutes'));
+            }
+        }
+        return response()->json($blocked);
+    }
+
+    public function get_days(Request $request, $uid, $type="online") {
+
+        $dates = [];
+        // one month early
+        $date = date('Y-m-d');
+        $end_date = date('Y-m-d', strtotime('+14 days', strtotime($date)));
+        $germanDaysOfWeek = [
+            'Sunday' => 'Sonntag',
+            'Monday' => 'Montag',
+            'Tuesday' => 'Dienstag',
+            'Wednesday' => 'Mittwoch',
+            'Thursday' => 'Donnerstag',
+            'Friday' => 'Freitag',
+            'Saturday' => 'Samstag'
+        ];
+        $germanMonths = [
+            'January' => 'Januar',
+            'February' => 'Februar',
+            'March' => 'März',
+            'April' => 'April',
+            'May' => 'Mai',
+            'June' => 'Juni',
+            'July' => 'Juli',
+            'August' => 'August',
+            'September' => 'September',
+            'October' => 'Oktober',
+            'November' => 'November',
+            'December' => 'Dezember'
+        ];
+
+        while (strtotime($date) <= strtotime($end_date)) {
+
+
+            $blocked_hours = Database::get('users/' . $uid . '/blocked_hours/' . $date);
+            $blocked = [];
+            if (is_array($blocked_hours)) {
+                foreach ($blocked_hours as $hour) {
+                    $blocked[] = $hour;
+                    $blocked[] = date('H:i', strtotime($hour . ' +15 minutes'));
+                    $blocked[] = date('H:i', strtotime($hour . ' +30 minutes'));
+                    $blocked[] = date('H:i', strtotime($hour . ' +45 minutes'));
+                }
+            }
+
+            $dates[] = [
+                'date' => $date,
+                'day' => date('d', strtotime($date)) . ' ' . $germanMonths[date('F', strtotime($date))],
+                'weekday' => $germanDaysOfWeek[date('l', strtotime($date))],
+                'blocked_hours' => $blocked ?? []
+            ];
+            $date = date('Y-m-d', strtotime($date . ' +1 day'));
+        }
+        return response()->json($dates);
+    }
+
+
+    public function reservation_exists($reservation = []) {
+        // $blocked_hours = $this->database->getReference('/users/'.$reservation['employee_uid'].'/blocked_hours/'.$reservation['date'])->getValue();
+        $blocked_hours = Database::get('users/' . $reservation['employee_uid'] . '/blocked_hours/' . $reservation['date']);
+        if (is_array($blocked_hours)) {
+            if (in_array($reservation['hour'], $blocked_hours)) {
+                return true;
+            }
+            if (date('i', strtotime($reservation['hour'])) == '15') {
+                if (in_array(date('H:i', strtotime($reservation['hour'] . ' -15 minutes')), $blocked_hours)) {
+                    return true;
+                }
+            } elseif (date('i', strtotime($reservation['hour'])) == '30') {
+                if (in_array(date('H:i', strtotime($reservation['hour'] . ' -30 minutes')), $blocked_hours)) {
+                    return true;
+                }
+            } elseif (date('i', strtotime($reservation['hour'])) == '45') {
+                if (in_array(date('H:i', strtotime($reservation['hour'] . ' -45 minutes')), $blocked_hours)) {
+                    return true;
+                }
+            }
+
+        }
+        return false;
+    }
     /**
      * store employee
      */
@@ -41,7 +147,8 @@ class EmployeeController extends Controller
         $dates = [];
         // one month early
         $date = date('Y-m-d');
-        $end_date = date('Y-m-d', strtotime('+1 month', strtotime($date)));
+        // the end  date after 14 days
+        $end_date = date('Y-m-d', strtotime('+14 days', strtotime($date)));
         $germanDaysOfWeek = [
             'Sunday' => 'Sonntag',
             'Monday' => 'Montag',
@@ -72,11 +179,10 @@ class EmployeeController extends Controller
                 'day' => date('d', strtotime($date)) . ' ' . $germanMonths[date('F', strtotime($date))],
                 // 'weekday' => date('l', strtotime($date)),
                 'weekday' => $germanDaysOfWeek[date('l', strtotime($date))],
+                'type' => $request->type ?? 'online'
             ];
             $date = date('Y-m-d', strtotime($date . ' +1 day'));
         }
-
-        // dd($dates);
 
 
         $date = date('Y-m-d');
@@ -98,7 +204,6 @@ class EmployeeController extends Controller
 
     public function available_dates($employee_uid) {
         $employee = Auth::getUserData($employee_uid);
-        // print_r($employee);
         if (!$employee) {
             return Redirect::route('site.index');
         }
@@ -134,9 +239,7 @@ class EmployeeController extends Controller
         while (strtotime($date) <= strtotime($end_date)) {
             $dates[] = [
                 'date' => $date,
-                // 'day' => date('d M', strtotime($date)),
                 'day' => date('d', strtotime($date)) . ' ' . $germanMonths[date('F', strtotime($date))],
-                // 'weekday' => date('l', strtotime($date)),
                 'weekday' => $germanDaysOfWeek[date('l', strtotime($date))],
             ];
             $date = date('Y-m-d', strtotime($date . ' +1 day'));

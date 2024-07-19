@@ -10,56 +10,102 @@ import leftArrowIcon from "@/Assets/NewAppointment/leftArrowIcon.svg";
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import logo from "@/Assets/Logo.png";
+
+import {
+    FiChevronRight,
+    FiChevronLeft,
+    FiChevronDown,
+    FiChevronUp,
+} from "react-icons/fi";
+
+import { IoIosStarOutline, IoIosVideocam } from "react-icons/io";
+import { HiMapPin } from "react-icons/hi2";
+import axios from "axios";
+import { useRef } from "react";
+
+import { Link } from "@inertiajs/react";
 
 
+
+
+const hours = [
+    "08:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+];
+
+const hours2 = [
+    "08:00",
+    "08:15",
+    "08:30",
+    "08:45",
+    "09:00",
+    "09:15",
+    "09:30",
+    "09:45",
+    "10:00",
+    "10:15",
+    "10:30",
+    "10:45",
+    "11:00",
+    "11:15",
+    "11:30",
+    "11:45",
+    "12:00",
+    "12:15",
+    "12:30",
+    "12:45",
+    "13:00",
+    "13:15",
+    "13:30",
+    "13:45",
+    "14:00",
+    "14:15",
+    "14:30",
+    "14:45",
+    "15:00",
+];
 
 
 const BlockDatesHours = ({auth}) => {
 
-    const [hours, setHours] = useState([]);
-    const { data, setData, post, processing, errors, reset } = useForm({
-        date: null,
-        hours: [],
-    });
+    const [loading, setLoading] = useState(false);
 
-    const selectDate = (date) => {
-        axios.get('/getblockhours?date='+date, {
-            date: date,
-        }).then((response) => {
-            setData("date", date);
-            console.log(data.date);
-            response.data.forEach((hour) => {
-                if (hour.blocked) {
-                    setData("hours", [...data.hours, hour.hour]);
-                }
-            });
-            console.log(response.data);
-            const dateBoxes = document.querySelectorAll(`.${styles.dateBox}`);
-            dateBoxes.forEach((dateBox) => {
-                dateBox.classList.remove(styles.selectedDateBox);
-            });
-            const selectedDate = document.querySelector(`.${styles.dateBox}[data-date="${date}"]`);
-            selectedDate.classList.add(styles.selectedDateBox);
 
-            setHours(response.data);
-        });
+    const [showMore, setShowMore] = useState(false);
 
-            // setData("date", date);
-    }
 
-    const selectHour = (hour) => {
-        const hours = data.hours;
-        const selectedHour = document.querySelector(`.${styles.timeBox}[data-hour="${hour}"]`);
-        if (hours.includes(hour)) {
-            const index = hours.indexOf(hour);
-            hours.splice(index, 1);
-            selectedHour.classList.remove(styles.timeBoxSelected);
+
+    const selectHour = (event) => {
+        const hour = event.target.getAttribute("data-hour");
+        const date = event.target.getAttribute("data-date");
+
+        if (data.times[date] && data.times[date].includes(hour)) {
+            // remove the time from the array
+            setData("times", data.times[date].filter((h) => h !== hour));
+            if (data.times[date].length === 0) {
+                delete data.times[date];
+            }
         } else {
-            hours.push(hour);
-            selectedHour.classList.add(styles.timeBoxSelected);
+            // add the time to the array
+            if (data.times[date]) {
+                setData("times", {...data.times, [date]: [...data.times[date], hour]});
+            } else {
+                setData("times", {...data.times, [date]: [hour]});
+            }
         }
-        setData("hours", hours);
+
+
+
+
     }
+
     const [successRes, setSuccessRes] = useState(false);
     const [show, setShow] = useState(false);
 
@@ -68,7 +114,80 @@ const BlockDatesHours = ({auth}) => {
         setShow(false);
     }
 
+
+
+    const scrollRefs = useRef({});
+
+
+    const scroll = (direction, uid) => {
+        const container = scrollRefs.current[uid];
+        const scrollAmount = 200;
+        const scrollDirection =
+            direction === "left" ? -scrollAmount : scrollAmount;
+        container.scrollBy({
+            top: 0,
+            left: scrollDirection,
+            behavior: "smooth",
+        });
+        const leftScrollBtn = container.previousElementSibling;
+        const rightScrollBtn = container.nextElementSibling;
+        container.addEventListener("scroll", () => {
+            if (container.scrollLeft === 0) {
+                leftScrollBtn.classList.add(styles.inactive);
+            } else {
+                leftScrollBtn.classList.remove(styles.inactive);
+            }
+            if (
+                container.scrollLeft >=
+                container.scrollWidth - container.clientWidth
+            ) {
+                rightScrollBtn.classList.add(styles.inactive);
+            } else {
+                rightScrollBtn.classList.remove(styles.inactive);
+            }
+        });
+    };
+
+    const [dates, setDates] = useState([]);
+
+    useEffect(() => {
+        axios.get("/available_dates/" + auth.user.uid)
+        .then((res) => {
+            // selectDate(res.data[0].date);
+            setDates(res.data);
+            setLoading(false);
+        })
+        .catch((err) => {
+            console.log(err);
+            setLoading(false);
+        }
+    );
+    }, []);
+
+
+    // const [hours, setHours] = useState([]);
+    const { data, setData, post, processing, errors, reset } = useForm({
+        times: [],
+    });
+
+
+    const [blockedHours, setBlockedHours] = useState([]);
+
+    const getBlockedHours = () => {
+        axios.get('/getblockhours').then((response) => {
+            setData("times", response.data);
+        });
+    }
+
+
+    useEffect(() => {
+        // getDays();
+        getBlockedHours();
+    }, []);
+
+
     const submit = () => {
+        console.log(data);
         post(route('blockhours'),
         {
             onSuccess: () => {
@@ -79,48 +198,8 @@ const BlockDatesHours = ({auth}) => {
             }
         });
     }
-    // dates are dates from tomorrow to 7 days from tomorrow
-    // make the date in form 2024-09-12
-    const start_date = new Date();
-    start_date.setDate(start_date.getDate() + 1);
-    const dates = [];
-    for (let i = 0; i < 7; i++) {
-        const date = new Date(start_date);
-        date.setDate(date.getDate() + i);
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        const weekday = date.toLocaleString('de-DE', { weekday: 'long' });
-        dates.push({
-            date: `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day}`,
-            day: day,
-            weekday: weekday,
-        });
-    }
 
-    const scroll = (direction) => {
-        const container = document.querySelector(`.${styles.dateBoxContainer}`);
-        const scrollAmount = 200;
-        const scrollDirection = direction === "left" ? -scrollAmount : scrollAmount;
-        container.scrollBy({
-            top: 0,
-            left: scrollDirection,
-            behavior: "smooth",
-        });
-        const scrollBtn = document.querySelector(`.${styles.scrollBtn}`);
-        scrollBtn.classList.remove(styles.inactive);
-        container.addEventListener("scroll", () => {
-            if (container.scrollLeft === 0) {
-                document.querySelector(`.${styles.scrollBtn}.left`).classList.add(styles.inactive);
-            }
-            if (container.scrollLeft === container.scrollWidth - container.clientWidth) {
-                document.querySelector(`.${styles.scrollBtn}.right`).classList.add(styles.inactive);
-            }
-            if (container.scrollLeft !== container.scrollWidth - container.clientWidth) {
-                document.querySelector(`.${styles.scrollBtn}.right`).classList.remove(styles.inactive);
-            }
-        });
-    };
+
 
     return (
 
@@ -136,59 +215,215 @@ const BlockDatesHours = ({auth}) => {
                 </Modal.Header>
                 <Modal.Body>This clock has been blocked successfully.</Modal.Body>
                 <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Ok
-                </Button>
+                <Link href="/profile">
+                Schließen
+                </Link>
                 </Modal.Footer>
             </Modal>}
 
             <h3 className={styles.title}>Blockierte Termine</h3>
             <p className={styles.subtitle}>Wählen Sie die Termine und Stunden aus, die Sie blockieren möchten</p>
             {/* <form> */}
-                {/* dates */}
-                <div className={styles.dateSelectContainer}>
-                <h5 className={styles.dateTitle}>Datum wählen</h5>
-                <div className={styles.dateSelect}>
-                    <button className={[styles.scrollBtn, styles.inactive].join(" ")} onClick={() => scroll("left")}>
-                    <img src={leftArrowIcon} alt="" />
-                    </button>
-                    <div className={styles.dateBoxContainer}>
-                        {dates.map((date, index) => {
-                            return (
-                                <div className={styles.dateBox} key={index} onClick={() => selectDate(date.date)} data-date={date.date}>
-                                    <h6 className={   styles.dateBoxTitle   }>{date.day}</h6>
-                                    <p className={styles.dateBoxDayInfo}>{date.weekday}</p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    <button className={styles.scrollBtn} onClick={() => scroll("right")}>
-                    <img src={rightArrowIcon} alt="" />
-                    </button>
-                </div>
-            </div>
+
+            <div className={styles.form}>
+            <div className="flex-1  w-full bg-white shadow-md ">
+                                    <>
+                                        <div>
+                                            {/* dates */}
+                                            <div
+                                                className={`${styles.dateSelectContainer} `}
+                                            >
+                                                <div
+                                                    className={`${styles.dateSelect}  `}
+                                                >
+                                                    <button
+                                                        className={`${styles.scrollBtn} left ${styles.inactive}`}
+                                                        onClick={() =>
+                                                            scroll(
+                                                                "left",
+                                                                auth.user.uid
+                                                            )
+                                                        }
+                                                    >
+                                                        <FiChevronLeft className="text-white" />
+                                                    </button>
+                                                    <div
+                                                        className={`${styles.dateBoxContainer} border-b-[1px] pb-3 `}
+                                                        ref={(el) =>
+                                                            (scrollRefs.current[
+                                                                auth.user.uid
+                                                            ] = el)
+                                                        }
+                                                    >
+                                                        {
+                                                        showMore
+                                                            ? dates.map(
+                                                                  (
+                                                                      date
+                                                                  ) => {
+                                                                      return (
+                                                                          <div
+                                                                              className="flex flex-col gap-8"
+                                                                          >
+                                                                              <div
+                                                                                  className={
+                                                                                      styles.dateBox
+                                                                                  }
+                                                                              >
+                                                                                  <h6
+                                                                                      className={
+                                                                                          styles.dateBoxTitle
+                                                                                      }
+                                                                                  >
+                                                                                      {
+                                                                                          date.day
+                                                                                      }
+                                                                                  </h6>
+
+                                                                                  <p
+                                                                                      className={
+                                                                                          styles.dateBoxDayInfo
+                                                                                      }
+                                                                                  >
+                                                                                      {date.weekday}
+                                                                                  </p>
+                                                                              </div>
+
+                                                                              <div className="flex flex-col items-center justify-center gap-2 min-w-[100px]">
+                                                                                  {hours.map(
+                                                                                      (
+                                                                                          hour
+                                                                                      ) => (
+
+                                                                                                <button
+                                                                                                className={data.times[date.date] && data.times[date.date].includes(hour) ? "border-2 hover:border-[#c7982e] border-transparent text-[#c7982e] bg-[#c99b314d] text-base font-semibold px-3 py-1 rounded-md timeBox text-white bg-[#c99b31]" :
+                                                                                                "border-2 border-transparent text-[#c7982e] bg-[#c99b314d] hover:border-[#c7982e] text-base font-semibold px-3 py-1 rounded-md timeBox"
+                                                                                                }
+                                                                                                data-date={date.date}
+                                                                                                data-hour={hour}
+                                                                                                onClick={(e) => {selectHour(e)}}
+                                                                                            >
+                                                                                                {
+                                                                                                    hour
+                                                                                                }
+                                                                                            </button>
+                                                                                      )
+                                                                                  )}
+                                                                              </div>
+                                                                          </div>
+                                                                      );
+                                                                  }
+                                                              )
+                                                            : dates.map(
+                                                                  (
+                                                                      date
+                                                                  ) => {
+                                                                      return (
+                                                                          <div
+                                                                              className="flex flex-col gap-8"
+                                                                          >
+                                                                              <div
+                                                                                  className={
+                                                                                      styles.dateBox
+                                                                                  }
+                                                                              >
+                                                                                  <h6
+                                                                                      className={
+                                                                                          styles.dateBoxTitle
+                                                                                      }
+                                                                                  >
+                                                                                      {
+                                                                                          date.day
+                                                                                      }
+                                                                                  </h6>
+
+                                                                                  <p
+                                                                                      className={
+                                                                                          styles.dateBoxDayInfo
+                                                                                      }
+                                                                                  >
+                                                                                      {date.weekday}
+                                                                                  </p>
+                                                                              </div>
+
+                                                                              <div className="flex flex-col items-center justify-center gap-2 min-w-[100px]">
+                                                                                  {hours
+                                                                                      .slice(
+                                                                                          0,
+                                                                                          5
+                                                                                      )
+                                                                                      .map(
+                                                                                          (
+                                                                                              hour
+                                                                                          ) => (
+
+                                                                                                    <button
 
 
+                                                                                                    className={data.times[date.date] && data.times[date.date].includes(hour) ? "border-2 hover:border-[#c7982e] border-transparent text-[#c7982e] bg-[#c99b314d] text-base font-semibold px-3 py-1 rounded-md timeBox text-white bg-[#c99b31]" :
+                                                                                                    "border-2 border-transparent text-[#c7982e] bg-[#c99b314d] hover:border-[#c7982e] text-base font-semibold px-3 py-1 rounded-md timeBox"
+                                                                                                    }                                                                                                         data-date={date.date}
+                                                                                                data-hour={hour}
+                                                                                                onClick={(e) => {selectHour(e)}}
+                                                                                                >
+                                                                                                    {
+                                                                                                        hour
+                                                                                                    }
+                                                                                                </button>
+                                                                                          )
+                                                                                      )}
+                                                                              </div>
+                                                                          </div>
+                                                                      );
+                                                                  }
+                                                              )
+                                                        }
+                                                    </div>
+                                                    <button
+                                                        className={`${styles.scrollBtn} right`}
+                                                        onClick={() =>
+                                                            scroll(
+                                                                "right",
+                                                                auth.user.uid
+                                                            )
+                                                        }
+                                                    >
+                                                        <FiChevronRight className="text-white" />
+                                                    </button>
+                                                </div>
 
-            <div className={styles.divider}></div>
+                                                <button
+                                                    onClick={() => setShowMore(!showMore)}
+                                                    className=" text-[#c7982e] mb-6 flex gap-2 items-center justify-center "
+                                                >
+                                                    {showMore ? (
+                                                        <>
+                                                            {" "}
+                                                            <span>
+                                                                Weniger anzeigen{" "}
+                                                            </span>{" "}
+                                                            <FiChevronUp className="h-5 w-5" />{" "}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            {" "}
+                                                            <span>
+                                                                Mehr
+                                                                Sprechzeiten
+                                                                anzeigen
+                                                            </span>{" "}
+                                                            <FiChevronDown className="h-5 w-5" />{" "}
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
 
-            {/* hours */}
-
-            <div className={styles.timeSelectContainer}>
-                <h5 className={styles.dateTitle}>Verfügbare Stunden</h5>
-                <div className={`${styles.timeSelect} grid md:grid-cols-3 grid-cols-2 gap-2  `}>
-                    {hours.map((hour, index) => {
-                        return (
-                            // on click add to array if hour.blocked is true add class timeBoxSelected
-                            <div className={[styles.timeBox , data.hours.includes(hour.hour) ? styles.timeBoxSelected : ''].join(" ")} key={index} onClick={() => selectHour(hour.hour)} data-hour={hour.hour}>
-                                {hour.hour}
                             </div>
-                        );
-                    })}
-                </div>
-            </div>
-
             <button className={styles.submitBtn} type="submit" onClick={() => submit()}>Blockieren</button>
+
+            </div>
         {/* </form> */}
     </div>
 

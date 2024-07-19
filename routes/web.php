@@ -37,7 +37,8 @@ Route::get('/reservation', function () {
 Route::get('/employees/{tab}', [DoctorController::class, 'doctorList'])->name('doctor.doctorList');
 Route::get('/employees/{uid}', [DoctorController::class, 'show'])->name('doctor.show');
 
-
+Route::get('/employee/get_days/{uid}/{type}', [EmployeeController::class, 'get_days'])->name('employee.get_days');
+Route::get('/employee/get_blocked_hours/{uid}', [EmployeeController::class, 'get_blocked_hours'])->name('employee.get_blocked_hours');
 
 Route::get('/employee/{uid}', [EmployeeController::class, 'show'])->name('employee.show');
 Route::post('/reservation/check/', [ReservationController::class, 'check'])->name('reservation.check');
@@ -49,10 +50,10 @@ Route::post('/reservation/quick/', [ReservationController::class, 'quick'])->nam
 // Route::middleware('auth')->group(function () {
 Route::middleware(['firebase', 'firebaseVerified'])->group(function () {
 
-    Route::middleware('employee')->group(function () {
+    // Route::middleware('employee')->group(function () {
         Route::get('/reservation/accept/{key}', [ReservationController::class, 'accept'])->name('reservation.accept');
         Route::get('/reservation/decline/{key}', [ReservationController::class, 'decline'])->name('reservation.decline');
-    });
+    // });
 
     // Route::post('/cancel/{key}', [ReservationController::class, 'cancel'])->name('reservation.cancel');
     Route::post('/cancel-reservation', [ReservationController::class, 'cancel'])->name('reservation.cancel');

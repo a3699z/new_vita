@@ -29,14 +29,18 @@ class ReservationController extends Controller
         // validate request
         $request->validate([
             'employeeUID' => 'required',
-            'date' => 'required',
-            'hour' => 'required',
+            // 'date' => 'required',
+            // 'hour' => 'required',
+            'time' => 'required',
         ]);
-        // dd($request->all());
+        // $time = 2024-07-21 08:15
+
+        $date = date('Y-m-d', strtotime($request->time));
+        $hour = date('H:i', strtotime($request->time));
         $reservation = array(
             'employee_uid' => $request->employeeUID,
-            'date' => $request->date,
-            'hour' => $request->hour,
+            'date' => $date,
+            'hour' => $hour,
             'is_online' => $request->online
         );
         $request->session()->put('reservation', $reservation);
@@ -137,6 +141,15 @@ class ReservationController extends Controller
 
             // Mail::to(Auth::getUserData()['email'])->send(new ReservationBookedPatient($reservation, $patient, $employee));
 
+            // this date blocked_hours
+            $blocked_hours = Database::get('users/'.$employee['uid'].'/blocked_hours/'.$reservation['date']);
+            if (is_array($blocked_hours)) {
+                $blocked_hours[] = $reservation['hour'];
+            } else {
+                $blocked_hours = [$reservation['hour']];
+            }
+            Database::set('users/'.$employee['uid'].'/blocked_hours/'.$reservation['date'], $blocked_hours);
+
             Mail::send('mail.resbooked_employee', [
                 'reservation' => $reservation,
                 'employee' => $employee,
@@ -203,25 +216,32 @@ class ReservationController extends Controller
         // ];
     }
 
-    public function reservation_exists($reservation, $uid)
-    {
-        // dd($reservation['employee_uid']);
-        $uid = $reservation['employee_uid'];
-        $reservations = Database::getWhere('reservations', 'employee_uid', $uid);
-        $reservations = array_filter($reservations, function($res) use ($reservation) {
-            return $res['date'] == $reservation['date'] && $res['hour'] == $reservation['hour'];
-        });
-
-        $blocked_hours = Database::get('users/'.$uid.'/blocked_hours/'.$reservation['date']);
-
-        // dd('users/'.$uid.'/blocked_hours/'.$reservation['date']);
-        if (is_array($blocked_hours) && in_array($reservation['hour'], $blocked_hours)) {
-            return true;
+    public function reservation_exists($reservation = [], $uid) {
+        $blocked_hours = $this->database->getReference('/users/'.$reservation['employee_uid'].'/blocked_hours/'.$reservation['date'])->getValue();
+        // dd($blocked_hours);
+        if (is_array($blocked_hours)) {
+            if (in_array($reservation['hour'], $blocked_hours)) {
+                return true;
+            }
+            switch (date('i', strtotime($reservation['hour']))) {
+                case '15':
+                    if (in_array(date('H:i', strtotime($reservation['hour'] . ' -15 minutes')), $blocked_hours)) {
+                        return true;
+                    }
+                    break;
+                case '30':
+                    if (in_array(date('H:i', strtotime($reservation['hour'] . ' -30 minutes')), $blocked_hours)) {
+                        return true;
+                    }
+                    break;
+                case '45':
+                    if (in_array(date('H:i', strtotime($reservation['hour'] . ' -45 minutes')), $blocked_hours)) {
+                        return true;
+                    }
+                    break;
+            }
         }
-
-        if (!empty($reservations)) {
-            return true;
-        }
+        return false;
     }
 
     public function onsite_reservation_exists($reservation, $uid)
@@ -513,18 +533,22 @@ class ReservationController extends Controller
 
         $request->validate([
             'patientUID' => 'required',
-            'date' => 'required',
-            'hour' => 'required',
+            // 'date' => 'required',
+            // 'hour' => 'required',
+            'time' => 'required',
             'insurance_type' => 'required',
             'insurance_policy_number' => 'required',
             'online' => 'required',
         ]);
 
+        $date = date('Y-m-d', strtotime($request->time));
+        $hour = date('H:i', strtotime($request->time));
+
         $reservation = array(
             'employee_uid' => Auth::getUID(),
             'user_uid' => $request->patientUID,
-            'date' => $request->date,
-            'hour' => $request->hour,
+            'date' => $date,
+            'hour' => $hour,
             'insurance_type' => $request->insurance_type,
             'insurance_policy_number' => $request->insurance_policy_number,
             'is_online' => $request->online,
