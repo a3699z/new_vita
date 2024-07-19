@@ -108,14 +108,14 @@ const SelectBox = (employees) => {
     <>
         <div className="mt-10 flex flex-col md:flex-row gap-4">
                     <Link
-                        href={route("doctor.doctorList", { tab: "tab1" })}
+                        href={route("employees.index")+`?type=onsite`}
                         className="flex items-center gap-2 bg-[#ca9b31] hover:bg-[#f9f8f2] border-2 border-[#ca9b31] hover:text-[#ca9b31]  text-white font-medium text-lg px-4 py-3 rounded-xl shadow-md   transition duration-150 ease-in-out"
                     >
                         <TbBuildingBank />
                         Vor-Ort-Termin
                     </Link>
                     <Link
-                        href={route("doctor.doctorList", { tab: "tab2" })}
+                        href={route("employees.index")+`?type=online`}
                         className="flex items-center gap-2 bg-[#ca9b31] hover:bg-[#f9f8f2] hover:border hover:border-[#ca9b31] hover:text-[#ca9b31]  text-white font-medium text-lg px-4 py-3 rounded-xl shadow-md   transition duration-150 ease-in-out"
                     >
                         <IoVideocamOutline />
