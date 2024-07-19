@@ -26,16 +26,20 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['firebase', 'firebaseVerified'])->name('dashboard');
 
-Route::get('/employees', function () {
-    return Inertia::render('DoctorList/index');
-});
-
 Route::get('/reservation', function () {
     return Inertia::render('Reservation/CreateNew/index');
 });
 
-Route::get('/employees/{tab}', [DoctorController::class, 'doctorList'])->name('doctor.doctorList');
-Route::get('/employees/{uid}', [DoctorController::class, 'show'])->name('doctor.show');
+// Route::get('/employees/{tab}', [DoctorController::class, 'doctorList'])->name('doctor.doctorList');
+// Route::get('/employees/{uid}', [DoctorController::class, 'show'])->name('doctor.show');
+
+
+// Route::get('/employees', function () {
+//     return Inertia::render('DoctorList/index');
+// });
+
+Route::get('/employees', [EmployeeController::class, 'index'])->name('employee.index');
+
 
 Route::get('/employee/get_days/{uid}/{type}', [EmployeeController::class, 'get_days'])->name('employee.get_days');
 Route::get('/employee/get_blocked_hours/{uid}', [EmployeeController::class, 'get_blocked_hours'])->name('employee.get_blocked_hours');

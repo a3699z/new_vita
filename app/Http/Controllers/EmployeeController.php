@@ -16,28 +16,84 @@ use App\Http\Facades\Database;
 class EmployeeController extends Controller
 {
 
-    public function get_blocked_hours(Request $request, $uid) {
-        $blocked_hours = Database::get('users/' . $uid . '/blocked_hours');
-        $blocked = [];
-        foreach ($blocked_hours as $date => $hours) {
-            foreach ($hours as $hour) {
-                $blocked[$date][] = $hour;
-                $blocked[$date][] = date('H:i', strtotime($hour . ' +15 minutes'));
-                $blocked[$date][] = date('H:i', strtotime($hour . ' +30 minutes'));
-                $blocked[$date][] = date('H:i', strtotime($hour . ' +45 minutes'));
+    public function index (Request $request ) {
+        // $employees = $this->database->getReference('/users')->orderByChild('user_type')->equalTo('employee')->getValue();
+        $employees = Database::getWhere('users', 'user_type', 'employee');
 
+
+        $dates = [];
+        // one month early
+        $date = date('Y-m-d');
+        // the end  date after 14 days
+        $end_date = date('Y-m-d', strtotime('+14 days', strtotime($date)));
+        $germanDaysOfWeek = [
+            'Sunday' => 'Sonntag',
+            'Monday' => 'Montag',
+            'Tuesday' => 'Dienstag',
+            'Wednesday' => 'Mittwoch',
+            'Thursday' => 'Donnerstag',
+            'Friday' => 'Freitag',
+            'Saturday' => 'Samstag'
+        ];
+        $germanMonths = [
+            'January' => 'Januar',
+            'February' => 'Februar',
+            'March' => 'März',
+            'April' => 'April',
+            'May' => 'Mai',
+            'June' => 'Juni',
+            'July' => 'Juli',
+            'August' => 'August',
+            'September' => 'September',
+            'October' => 'Oktober',
+            'November' => 'November',
+            'December' => 'Dezember'
+        ];
+        while (strtotime($date) <= strtotime($end_date)) {
+            $dates[] = [
+                'date' => $date,
+                // 'day' => date('d M', strtotime($date)),
+                'day' => date('d', strtotime($date)) . ' ' . $germanMonths[date('F', strtotime($date))],
+                // 'weekday' => date('l', strtotime($date)),
+                'weekday' => $germanDaysOfWeek[date('l', strtotime($date))],
+                'type' => $request->type ?? 'online'
+            ];
+            $date = date('Y-m-d', strtotime($date . ' +1 day'));
+        }
+
+        return Inertia::render('DoctorList/index', [
+            'employees' => $employees,
+            'type' => $request->type ?? 'online',
+            'dates' => $dates
+        ]);
+    }
+
+    public function get_blocked_hours(Request $request, $uid) {
+        $blocked_hours = Database::get('users/' . $uid . '/blocked_hours') ?? [];
+        // dd($blocked_hours);
+        $blocked = [];
+        if (is_array($blocked_hours)) {
+            foreach ($blocked_hours as $date => $hours) {
+                if (is_array($hours)) {
+                    foreach ($hours as $hour) {
+                        $blocked[$date][] = $hour;
+                        $blocked[$date][] = date('H:i', strtotime($hour . ' +15 minutes'));
+                        $blocked[$date][] = date('H:i', strtotime($hour . ' +30 minutes'));
+                        $blocked[$date][] = date('H:i', strtotime($hour . ' +45 minutes'));
+                    }
+                }
             }
         }
         $reservations = Database::getWhere('reservations', 'employee_uid', $uid);
         foreach ($reservations as $reservation) {
             $blocked[$reservation['date']][] = $reservation['hour'];
-            // if the reservations not online add 3 more hours
             if (!$reservation['is_online']) {
                 $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +15 minutes'));
                 $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +30 minutes'));
                 $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +45 minutes'));
             }
         }
+        // dd($blocked);
         return response()->json($blocked);
     }
 

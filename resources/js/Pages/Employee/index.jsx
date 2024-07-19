@@ -217,7 +217,6 @@ export default function Employee({ auth, dates, employee, type }) {
 
             <div className={`${styles.container} `}>
             <div
-                        key={employee.id}
                         className="items-center mx-auto max-w-[1000px] p-2    "
                     >
                         <div className="flex md:flex-row flex-col min-h-[380px] ">

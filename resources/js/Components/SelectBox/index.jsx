@@ -106,7 +106,7 @@ const SelectBox = (employees) => {
 
   return (
     <>
-        {/* <div className="mt-10 flex flex-col md:flex-row gap-4">
+        <div className="mt-10 flex flex-col md:flex-row gap-4">
                     <Link
                         href={route("doctor.doctorList", { tab: "tab1" })}
                         className="flex items-center gap-2 bg-[#ca9b31] hover:bg-[#f9f8f2] border-2 border-[#ca9b31] hover:text-[#ca9b31]  text-white font-medium text-lg px-4 py-3 rounded-xl shadow-md   transition duration-150 ease-in-out"
@@ -121,24 +121,22 @@ const SelectBox = (employees) => {
                         <IoVideocamOutline />
                         Videosprechstunde
                     </Link>
-                </div> */}
+                </div>
 
-                {/* using radio input instead */}
+                {/* using radio input instead
                 <div className="mt-10 flex flex-col md:flex-row gap-4">
                     {/* <label className="flex items-center gap-2 bg-[#ca9b31] hover:bg-[#f9f8f2] border-2 border-[#ca9b31] hover:text-[#ca9b31]  text-white font-medium text-lg px-4 py-3 rounded-xl shadow-md   transition duration-150 ease-in-out">
-                    // give it radioLabel and if it is selected give it selectedRadioLabel */}
                     <label className={styles.radioLabel + (selectedType === 'onsite' ? ' ' + styles.selectedRadioLabel : '')}>
                         <input type="radio" name="appointmentType" value="onsite" onChange={(e) => setSelectedType(e.target.value)} checked={selectedType === 'onsite'} />
                         <TbBuildingBank />
                         Vor-Ort-Termin
                     </label>
-                    {/* <label className="flex items-center gap-2 bg-[#ca9b31] hover:bg-[#f9f8f2] hover:border hover:border-[#ca9b31] hover:text-[#ca9b31]  text-white font-medium text-lg px-4 py-3 rounded-xl shadow-md   transition duration-150 ease-in-out"> */}
                     <label className={styles.radioLabel + (selectedType === 'online' ? ' ' + styles.selectedRadioLabel : '')}>
                         <input type="radio" name="appointmentType" value="online" onChange={(e) => setSelectedType(e.target.value)} checked={selectedType === 'online'} />
                         <IoVideocamOutline />
                         Videosprechstunde
                     </label>
-                </div>
+                </div> */}
 
         <div className={styles.container}>
         {/* slectBox selected start */}
