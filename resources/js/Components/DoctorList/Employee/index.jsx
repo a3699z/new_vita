@@ -176,7 +176,7 @@ export default function Employee({ employee, type, dates }) {
                     firstAvailable = timeBox;
                     setData("time", firstAvailable.getAttribute("data-date") + " " + firstAvailable.getAttribute("data-hour"));
                     // console.log(firstAvailable.getAttribute("data-date") + " " + firstAvailable.getAttribute("data-hour"));
-                    data.push("time", firstAvailable.getAttribute("data-date") + " " + firstAvailable.getAttribute("data-hour"));
+                    // data.push("time", firstAvailable.getAttribute("data-date") + " " + firstAvailable.getAttribute("data-hour"));
                     submit();
 
                 }
