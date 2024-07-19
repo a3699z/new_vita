@@ -88,6 +88,7 @@ class EmployeeController extends Controller
         foreach ($reservations as $reservation) {
             $blocked[$reservation['date']][] = $reservation['hour'];
             if (!$reservation['is_online']) {
+                // print_r($reservation);
                 $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +15 minutes'));
                 $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +30 minutes'));
                 // $blocked[$reservation['date']][] = date('H:i', strtotime($reservation['hour'] . ' +45 minutes'));

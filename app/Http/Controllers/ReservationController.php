@@ -141,15 +141,6 @@ class ReservationController extends Controller
 
             // Mail::to(Auth::getUserData()['email'])->send(new ReservationBookedPatient($reservation, $patient, $employee));
 
-            // this date blocked_hours
-            $blocked_hours = Database::get('users/'.$employee['uid'].'/blocked_hours/'.$reservation['date']);
-            if (is_array($blocked_hours)) {
-                $blocked_hours[] = $reservation['hour'];
-            } else {
-                $blocked_hours = [$reservation['hour']];
-            }
-            Database::set('users/'.$employee['uid'].'/blocked_hours/'.$reservation['date'], $blocked_hours);
-
             Mail::send('mail.resbooked_employee', [
                 'reservation' => $reservation,
                 'employee' => $employee,
