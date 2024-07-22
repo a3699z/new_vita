@@ -75,7 +75,7 @@
                                 <select class="form-control select2-auto-width" name="employee_uid">
                                     @foreach($employees as $uid => $employee)
                                         <option value="{{$uid}}"
-                                                @if($reservation->employee_uid == $uid) selected @endif>{{$employee['name']}}</option>
+                                                @if($reservation->employee_uid == $uid) selected @endif>{{$employee['username']}} {{$employee['name']}}</option>
                                     @endforeach
                                 </select>
                             </div>
