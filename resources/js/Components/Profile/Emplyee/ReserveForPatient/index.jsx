@@ -299,7 +299,7 @@ const ReserveForPatient = ({auth}) => {
                         {/* <option value="">Patient auswählen</option> */}
 
                         {Object.entries(patients).map(([key, value]) => (
-                            <option key={key} value={key}>{value.name}</option>
+                            <option key={key} value={key}>{value.username} {value.name}</option>
                         ))}
                     </select>
                     <InputError error={errors.patientUID} />
