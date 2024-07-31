@@ -12,7 +12,7 @@ const ProfileInfo = ({auth}) => {
           <img src={proilePhoto} className={styles.profilePhoto} alt="" />
         </div>
         <div className={styles.infoContainer}>
-          <h6 className={styles.name}>{auth.user.username}</h6>
+            <h6 className={styles.name}>{auth.user.username} {auth.user.name}</h6>
           <p className={styles.email}>{auth.user.email}</p>
         </div>
       </div>

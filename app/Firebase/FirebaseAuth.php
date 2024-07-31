@@ -415,7 +415,7 @@ class FirebaseAuth
                 if ($notification['datetime'] > time() && $notification['datetime'] < time() + 86400) {
                     $patient = $this->getUserData($notification['user_uid']);
                     $notification['with'] = $patient;
-                    $notification['message'] = 'You have an appointment with ' . $patient['name'] . ' on ' . $notification['date'] . ' at ' . $notification['hour'];
+                    $notification['message'] = 'You have an appointment with ' . $patient['username'] . ' ' . $patient['name'] . ' on ' . $notification['date'] . ' at ' . $notification['hour'];
                     $userNotifcation[] = $notification;
                 }
             }
@@ -436,9 +436,9 @@ class FirebaseAuth
                 $notification['datetime'] = strtotime($notification['date'] . ' ' . $notification['hour']);
 
                 if ($notification['datetime'] > time() && $notification['datetime'] < time() + 86400) {
-                    $employee = $this->getUserData($notification['user_uid']);
+                    $employee = $this->getUserData($notification['employee_uid']);
                     $notification['with'] = $employee;
-                    $notification['message'] = 'You have an appointment with Dr.' . $employee['name'] . ' on ' . $notification['date'] . ' at ' . $notification['hour'];
+                    $notification['message'] = 'You have an appointment with Dr.' .  $employee['username'] . ' ' . $employee['name'] . ' on ' . $notification['date'] . ' at ' . $notification['hour'];
                     $userNotifcation[] = $notification;
                 }
             }
