@@ -72,7 +72,7 @@ const Visits = ({reservations}) => {
           <VisitCard
             key={reservation.key}
             visitType={reservation.is_online?'Videosprechstunde Termin':'Vor-Ort-Termin'}
-            doctorName={reservation.employee.name}
+            doctorName={reservation.employee.username + ' ' + reservation.employee.name}
             profession='nurse'
             date={reservation.date}
             time={reservation.hour}
